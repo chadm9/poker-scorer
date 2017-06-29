@@ -1,9 +1,5 @@
 
 
-read_in = open('hand.txt', 'r')
-input = read_in.readlines()
-
-# print input
 
 def get_hand(stryng):
     hand = stryng.split(' ')
@@ -17,12 +13,6 @@ def get_hand(stryng):
 
     return hands
 
-# print get_hand(input[0])
-
-
-
-
-# flushes have all the same suit (which appears at index -1 of the card string.  This function checks for a flush)
 
 def has_flush(hand):
     suit = hand[0][-1]
@@ -102,16 +92,10 @@ def has_full_house(hand):
 
 
     return has_pair and has_triple
-    # if has_pair and has_triple:
-    #     return True
-    # else:
-    #     return False
 
 
 def has_4_of_a_kind(hand):
     hand_dict = hand_dictionary(hand)
-    #print hand_dict
-    has_quads = None
 
     for key in hand_dict:
 
@@ -174,17 +158,20 @@ def which_pair(hand):
 
 def which_2_pair(hand):
     hand_dict = hand_dictionary(hand)
-    # print hand_dict
+    single_card_value = None
     pair_values = []
     for key in hand_dict:
 
         if hand_dict[key] == 2:
             #print key
             pair_values.append(key)
+        elif hand_dict[key] == 1:
+            single_card_value = key
 
     pair_values = sorted(pair_values)
 
     pair_values.reverse()
+    pair_values.append(single_card_value)
     return pair_values
 
 def which_3_of_a_kind(hand):
@@ -199,45 +186,18 @@ def which_3_of_a_kind(hand):
 
     return trip_value
 
-def has_duplicates(hand):
-    duplicate_cards = 1
-    max_duplicates = 1
-    max_card_value = 0
-    secondary_duplicate = 0
-    highest_card_in_hand = 0
 
-    for i in range(len(hand)-1):
-        current_card_value = convert_to_int(hand[i][0])
-        j = i + 1
-        # print current_card_value
-        while j < (len(hand)):
+def which_4_of_a_kind(hand):
+    hand_dict = hand_dictionary(hand)
+    # print hand_dict
+    trip_value = None
+    for key in hand_dict:
 
+        if hand_dict[key] == 4:
 
+            trip_value = key
 
-            if hand[i][0] == hand[j][0]:
-                duplicate_cards += 1
-
-                if max_duplicates <= duplicate_cards:
-                    max_duplicates = duplicate_cards
-
-                    if current_card_value > max_card_value:
-                        secondary_duplicate = max_card_value
-                        max_card_value = current_card_value
-
-
-                # elif duplicate_cards == 2:
-                #     secondary_duplicate = current_card_value
-
-
-
-            j += 1
-
-
-
-        duplicate_cards = 1
-
-
-    return [max_duplicates, max_card_value, secondary_duplicate]
+    return trip_value
 
 
 def highest_card(hand):
@@ -251,79 +211,64 @@ def highest_card(hand):
     return highest_card_value
 
 
-test_hand = ['TC', '5S', '9C', '9S', 'KD']
-#
-# print which_pair(test_hand)
-
-
-
-
-# print has_straight(test_hand)
-
-
-# print highest_card(test_hand)
-
 def hand_strength(hand):
 
     if has_flush(hand) and has_straight(hand):
         return[10, highest_card(hand)]
-    elif has_flush(hand):
-        return [9, highest_card(hand)]
     elif has_4_of_a_kind(hand):
-        return [8]
+        return [9, which_4_of_a_kind(hand)]
     elif has_full_house(hand):
-        return [7]
+        return [8, which_3_of_a_kind(hand)]
+    elif has_flush(hand):
+        return [7, get_hand_value_array(hand)[0], get_hand_value_array(hand)[1], get_hand_value_array(hand)[2],
+                get_hand_value_array(hand)[3], get_hand_value_array(hand)[4]]
     elif has_straight(hand):
         return [6, highest_card(hand)]
     elif has_3_of_a_kind(hand):
         return [5, which_3_of_a_kind(hand)]
     elif has_2_pair(hand):
-        return [4, which_2_pair(hand)[0], which_2_pair(hand)[1]]
+        return [4, which_2_pair(hand)[0], which_2_pair(hand)[1], which_2_pair(hand)[2]]
     elif has_pair(hand):
-        return [3, which_pair(hand), get_hand_value_array(hand)[0]]
+        return [3, which_pair(hand), get_hand_value_array(hand)[0], get_hand_value_array(hand)[1], get_hand_value_array(hand)[2],
+                get_hand_value_array(hand)[3], get_hand_value_array(hand)[4]]
     else:
-        return [2, get_hand_value_array(hand)[0],get_hand_value_array(hand)[1]]
+        return [2, get_hand_value_array(hand)[0], get_hand_value_array(hand)[1], get_hand_value_array(hand)[2],
+                get_hand_value_array(hand)[3], get_hand_value_array(hand)[4]]
 
 
+def main():
 
-# print hand_strength(test_hand)
+    read_in = open('hand.txt', 'r')
+    input = read_in.readlines()
 
-player1wins = 0
-player2wins = 0
+    player1wins = 0
+    player2wins = 0
+    ties = 0
 
-for hands in input:
+    for hands in input:
 
+        hand1 = get_hand(hands)[0]
+        hand2 = get_hand(hands)[1]
 
+        hand1strength = hand_strength(hand1)
+        hand2strength = hand_strength(hand2)
 
+        #print hand_strength(hand1), hand_strength(hand2)
 
-    hand1 = get_hand(hands)[0]
-    hand2 = get_hand(hands)[1]
+        counter = 0
 
-    hand1strength = hand_strength(hand1)
-    hand2strength = hand_strength(hand2)
+        while (hand1strength[counter] == hand2strength[counter] and counter < (len(hand1strength) - 1)):
+            counter += 1
 
-
-
-    if hand1strength[0] != hand2strength[0]:
-        if hand1strength[0] > hand2strength[0]:
-            player1wins +=1
-        else:
-            player2wins +=1
-
-
-    elif hand1strength[1] != hand2strength[1]:
-        if hand1strength[1] > hand2strength[1]:
+        if hand1strength[counter] > hand2strength[counter]:
             player1wins += 1
-        else:
+        elif hand2strength[counter] > hand1strength[counter]:
             player2wins += 1
-
-    elif hand1strength[2] != hand2strength[2]:
-        if hand1strength[2] > hand2strength[2]:
-            player1wins += 1
         else:
-            player2wins += 1
+            ties += 1
 
-    # print hand_strength(hand1), hand_strength(hand2)
+    print 'player 1 wins: ' + str(player1wins) + '\nplayer 2 wins: ' + str(player2wins) + '\nties: ' + str(ties)
 
-print 'player 1 wins: ' + str(player1wins) + '\nplayer 2 wins: ' + str(player2wins)
+
+main()
 
