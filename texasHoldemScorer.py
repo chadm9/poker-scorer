@@ -1,19 +1,5 @@
 
 
-
-def get_hand(stryng):
-    hand = stryng.split(' ')
-    hand[-1] = hand[-1].replace('\n', '')
-    player_1_hand = hand[0:5]
-    player_2_hand = hand[5:10]
-    hands = []
-    hands.append(player_1_hand)
-    hands.append(player_2_hand)
-
-
-    return hands
-
-
 def has_flush(hand):
     suit = hand[0][-1]
     for cards in hand:
@@ -42,6 +28,9 @@ def has_straight(hand):
 
     player_hand = sorted(player_hand)
 
+    if player_hand == [2,3,4,5,14]:
+        return True
+
 
     previous_number = player_hand[0]
 
@@ -54,6 +43,7 @@ def has_straight(hand):
         previous_number = player_hand[i]
 
     return True
+
 
 def get_hand_value_array(hand):
 
@@ -256,9 +246,11 @@ def unique_5_card_combinations(lyst, combination=[], combinations=[]):
 
 
 
-def best_5_card_combination(hand):
-    possible_hands = unique_5_card_combinations(hand)
+def best_5_card_combination(seven_card_hand):
+
+    possible_hands = unique_5_card_combinations(seven_card_hand, [], [])
     best_hand = possible_hands[0]
+
 
     for this_hand in possible_hands:
         best_hand_strength = hand_strength(best_hand)
@@ -277,8 +269,13 @@ def best_5_card_combination(hand):
 
 
 def get_winner(hand1, hand2):
+    # print hand1
+    # print hand2
     player_1_hand = best_5_card_combination(hand1)
     player_2_hand = best_5_card_combination(hand2)
+
+    # print player_1_hand
+    # print player_2_hand
 
     player_1_hand_strength = hand_strength(player_1_hand)
     player_2_hand_strength = hand_strength(player_2_hand)
@@ -288,53 +285,20 @@ def get_winner(hand1, hand2):
         counter += 1
 
     if player_1_hand_strength[counter] > player_2_hand_strength[counter]:
-        return {'winner': 'player 1', 'loser': 'player 1', 'player1sHand': player_1_hand,
+        return {'winner': 'player 1', 'loser': 'player 2', 'player1sHand': player_1_hand,
                 'player2sHand': player_2_hand}
     elif player_2_hand_strength[counter] > player_1_hand_strength[counter]:
-        return {'winner': 'player 2', 'loser': 'player 2', 'player1sHand': player_1_hand,
+        return {'winner': 'player 2', 'loser': 'player 1', 'player1sHand': player_1_hand,
                 'player2sHand': player_2_hand}
     else:
-        return {'winner': 'Tie', 'loser': 'Tie', 'player1sHand': player_1_hand,
+        return {'winner': 'tie', 'loser': 'tie', 'player1sHand': player_1_hand,
                 'player2sHand': player_2_hand}
 
-test_hand1 = ['5H', '6H', 'KH', '2H', '3H', 'QD', 'AD']
-test_hand2 = ['5D', '6D', 'KH', '2H', '3H', 'QS', 'AS']
-
-print get_winner(test_hand1, test_hand2)
-
-
-def main():
-
-    read_in = open('hand.txt', 'r')
-    input = read_in.readlines()
-
-    player1wins = 0
-    player2wins = 0
-    ties = 0
-
-    for hands in input:
-
-        hand1 = get_hand(hands)[0]
-        hand2 = get_hand(hands)[1]
-
-        hand1strength = hand_strength(hand1)
-        hand2strength = hand_strength(hand2)
-
-        #print hand_strength(hand1), hand_strength(hand2)
-
-        counter = 0
-
-        while (hand1strength[counter] == hand2strength[counter] and counter < (len(hand1strength) - 1)):
-            counter += 1
-
-        if hand1strength[counter] > hand2strength[counter]:
-            player1wins += 1
-        elif hand2strength[counter] > hand1strength[counter]:
-            player2wins += 1
-        else:
-            ties += 1
-
-    print 'player 1 wins: ' + str(player1wins) + '\nplayer 2 wins: ' + str(player2wins) + '\nties: ' + str(ties)
+# test_hand1 = ['5H', '6H', 'KH', '2H', '3H', 'QD', 'AH']
+# test_hand2 = ['2H', '3H', '4H', '5D', '3D', 'QS', 'AS']
+# test_hand3 = ['5D', '5H', '5S', '2D', '2H', 'QD', 'AS']
+#
+# print get_winner(test_hand1, test_hand2)
 
 
 
